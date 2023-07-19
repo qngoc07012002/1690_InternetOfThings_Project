@@ -70,22 +70,23 @@ void loop() {
     tagID.concat(String(mfrc522.uid.uidByte[i] < 0x10 ? "0" : ""));
     tagID.concat(String(mfrc522.uid.uidByte[i], HEX));
   }
-
   tagID.toUpperCase();
   mfrc522.PICC_HaltA();
-  display.clearDisplay();
-  display.setTextColor(WHITE);
-  display.setTextSize(2);
-  display.setCursor(0, 0);
-  display.println("RFID:");
-  display.setTextSize(2);
-  display.setCursor(0, 24);
-  display.println(tagID);
-  display.display();
+
+  // display.clearDisplay();
+  // display.setTextColor(WHITE);
+  // display.setTextSize(2);
+  // display.setCursor(0, 0);
+  // display.println("RFID:");
+  // display.setTextSize(2);
+  // display.setCursor(0, 24);
+  // display.println(tagID);
+  // display.display();
 
   // postNewStudent(tagID);
-  String studentInfo = getStudentInfo(tagID);
-  parseStudentInfo(studentInfo);
+  
+  getStudentInfo(tagID);
+  
 
 
 
@@ -110,25 +111,27 @@ void postNewStudent(String tagID) {
   http.end();
 }
 
-String getStudentInfo(String tagID) {
+void getStudentInfo(String tagID) {
   String url = "http://www.nqngoc.id.vn/get_StudentInfomation.php?rfid=" + tagID;
   WiFiClient client; 
   HTTPClient http;
+  String payload = "";
 
   http.begin(client, url);
   int httpCode = http.GET();
 
   if (httpCode == HTTP_CODE_OK) {
-    String payload = http.getString();
+    payload = http.getString();
     http.end();
-    return payload;
+    
   }
 
   http.end();
-  return "";
+
+  parseStudentInfo(tagID, payload);
 }
 
-void parseStudentInfo(String studentInfo) {
+void parseStudentInfo(String tagID, String studentInfo) {
   StaticJsonDocument<192> doc;
 
   DeserializationError error = deserializeJson(doc, studentInfo);
@@ -141,5 +144,26 @@ void parseStudentInfo(String studentInfo) {
   const char* name = doc["Name"];
   const char* studentCode = doc["Student_Code"]; // "13E856FC"
 
-  Serial.println(name);
+  displayStudentInformation(tagID, name, studentCode);
+
+}
+
+void displayStudentInformation(String rfid, String name, String studentCode) {
+  if (name.isEmpty()) {
+    Serial.println(rfid);
+    postNewStudent(rfid);
+    display.clearDisplay();
+    display.setTextSize(1);
+    display.setCursor(0, 5);
+    display.println("New Student");
+    display.display();
+  } else {
+    display.clearDisplay();
+    display.setTextSize(1);
+    display.setCursor(0, 5);
+    display.println(name);
+    display.setCursor(0, 40);
+    display.println(studentCode);
+    display.display();
+  }
 }
