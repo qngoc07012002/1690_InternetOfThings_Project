@@ -1,5 +1,8 @@
 <?php
-@include 'config.php';
+$servername = "103.27.239.251"; 
+$username = "ngoc_db";
+$password = "ngoc123"; 
+$dbname = "ngoc_db";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
