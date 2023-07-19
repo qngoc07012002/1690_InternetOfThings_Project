@@ -4,9 +4,9 @@
 #include <SPI.h>
 #include <MFRC522.h>
 #include <ESP8266WiFi.h>
-#include <BlynkSimpleEsp8266.h>
 #include <ESP8266HTTPClient.h>
 #include <WiFiClient.h>
+#include <ArduinoJson.h>
 
 #define OLED_ADDRESS 0x3C // OLED I2C address (may vary depending on the OLED module)
 #define RST_PIN 0         // GPIO pin connected to RC522 module reset
@@ -16,10 +16,8 @@
 Adafruit_SSD1306 display(128, 64, &Wire, -1);
 MFRC522 mfrc522(SS_PIN, RST_PIN);
 
-char auth[] = "Tl9Nroq1FgOKSwE-Hv_CewzuaBy7UZTt"; // Blynk authentication token
 char ssid[] = "LINH HOMIE F3 A";        // Wi-Fi network SSID
 char password[] = "LINHHOMIEcamon"; // Wi-Fi network password
-const char* apiEndpoint = "http://www.nqngoc.id.vn/post_NewStudent.php";
 
 void setup() {
   Serial.begin(115200);
@@ -32,26 +30,35 @@ void setup() {
 
   display.clearDisplay();
   display.setTextColor(WHITE);
-  display.setTextSize(2);
+  display.setTextSize(1);
   display.setCursor(0, 0);
-  display.println("RFID Reader");
-  display.display();
 
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
     delay(1000);
-    Serial.println("Connecting to WiFi...");
+    display.println("Connecting to WiFi...");
+    
   }
-  Serial.println("Connected to WiFi");
+  display.clearDisplay();
+  display.setTextSize(1);
+  display.setCursor(0,0);
+  display.println("Connected to WiFi!");
+  display.display();
 
-  Blynk.begin(auth, ssid, password); // Connect to Blynk server
+  delay(1000);
+
+  display.clearDisplay();
+  display.setTextSize(2);
+  display.setCursor(20, 0);
+  display.println("Student");
+  display.println("Attendance");
+  display.display();
 
   pinMode(BUZZER_PIN, OUTPUT); 
   digitalWrite(BUZZER_PIN, LOW);
 }
 
 void loop() {
-  Blynk.run(); // Run Blynk library
 
   if (!mfrc522.PICC_IsNewCardPresent() || !mfrc522.PICC_ReadCardSerial()) {
     delay(100);
@@ -64,6 +71,7 @@ void loop() {
     tagID.concat(String(mfrc522.uid.uidByte[i], HEX));
   }
 
+  tagID.toUpperCase();
   mfrc522.PICC_HaltA();
   display.clearDisplay();
   display.setTextColor(WHITE);
@@ -75,31 +83,63 @@ void loop() {
   display.println(tagID);
   display.display();
 
-  WiFiClient client; // Create WiFiClient object
-  HTTPClient http;
-  http.begin(client, apiEndpoint); // Pass WiFiClient object to begin()
+  // postNewStudent(tagID);
+  String studentInfo = getStudentInfo(tagID);
+  parseStudentInfo(studentInfo);
 
-  http.addHeader("Content-Type", "application/x-www-form-urlencoded");
 
-  String postData = "rfid=" + tagID;
-  int httpResponseCode = http.POST(postData);
-  if (httpResponseCode > 0) {
-    Serial.print("API response code: ");
-    Serial.println(httpResponseCode);
-    String response = http.getString();
-    Serial.println(response);
-  } else {
-    Serial.print("Error sending request. HTTP error code: ");
-    Serial.println(httpResponseCode);
-  }
-
-  http.end();
-
-  Blynk.virtualWrite(V1, tagID); // Send tagID to Blynk server
 
   digitalWrite(BUZZER_PIN, HIGH);
   delay(300);
   digitalWrite(BUZZER_PIN, LOW);
 
   delay(1000);
+}
+
+void postNewStudent(String tagID) {
+  String url = "http://www.nqngoc.id.vn/post_NewStudent.php";
+  WiFiClient client; 
+  HTTPClient http;
+  http.begin(client, url); 
+
+  http.addHeader("Content-Type", "application/x-www-form-urlencoded");
+
+  String postData = "rfid=" + tagID;
+  int httpResponseCode = http.POST(postData);
+
+  http.end();
+}
+
+String getStudentInfo(String tagID) {
+  String url = "http://www.nqngoc.id.vn/get_StudentInfomation.php?rfid=" + tagID;
+  WiFiClient client; 
+  HTTPClient http;
+
+  http.begin(client, url);
+  int httpCode = http.GET();
+
+  if (httpCode == HTTP_CODE_OK) {
+    String payload = http.getString();
+    http.end();
+    return payload;
+  }
+
+  http.end();
+  return "";
+}
+
+void parseStudentInfo(String studentInfo) {
+  StaticJsonDocument<192> doc;
+
+  DeserializationError error = deserializeJson(doc, studentInfo);
+
+  if (error) {
+  Serial.print(F("deserializeJson() failed: "));
+  Serial.println(error.f_str());
+  return;
+  }
+  const char* name = doc["Name"];
+  const char* studentCode = doc["Student_Code"]; // "13E856FC"
+
+  Serial.println(name);
 }
