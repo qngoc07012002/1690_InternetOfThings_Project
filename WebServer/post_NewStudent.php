@@ -1,8 +1,8 @@
 <?php
-$servername = "sql202.infinityfree.com";
-$username = "if0_34619232";
-$password = "yWaJOEHTUEP4";
-$dbname = "if0_34619232_nqngoc";
+$servername = "103.27.239.251";
+$username = "ngoc_db";
+$password = "ngoc123";
+$dbname = "ngoc_db";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
