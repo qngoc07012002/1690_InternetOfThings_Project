@@ -8,16 +8,16 @@
 #include <WiFiClient.h>
 #include <ArduinoJson.h>
 
-#define OLED_ADDRESS 0x3C // OLED I2C address (may vary depending on the OLED module)
-#define RST_PIN 0         // GPIO pin connected to RC522 module reset
-#define SS_PIN 2          // GPIO pin connected to RC522 module chip select
+#define OLED_ADDRESS 0x3C 
+#define RST_PIN 0         
+#define SS_PIN 2          
 #define BUZZER_PIN 15
 
 Adafruit_SSD1306 display(128, 64, &Wire, -1);
 MFRC522 mfrc522(SS_PIN, RST_PIN);
 
-char ssid[] = "LINH HOMIE F3 A";        // Wi-Fi network SSID
-char password[] = "LINHHOMIEcamon"; // Wi-Fi network password
+char ssid[] = "LINH HOMIE F3 A";       
+char password[] = "LINHHOMIEcamon";
 
 void setup() {
   Serial.begin(115200);
@@ -142,7 +142,7 @@ void parseStudentInfo(String tagID, String studentInfo) {
   return;
   }
   const char* name = doc["Name"];
-  const char* studentCode = doc["Student_Code"]; // "13E856FC"
+  const char* studentCode = doc["Student_Code"]; 
 
   displayStudentInformation(tagID, name, studentCode);
 
