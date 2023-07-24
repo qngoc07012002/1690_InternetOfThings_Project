@@ -7,16 +7,17 @@
 #include <WiFiClient.h>
 #include <ArduinoJson.h>
 
-#define OLED_ADDRESS 0x3C // OLED I2C address (may vary depending on the OLED module)
-#define RST_PIN 0         // GPIO pin connected to RC522 module reset
-#define SS_PIN 2          // GPIO pin connected to RC522 module chip select
+#define OLED_ADDRESS 0x3C 
+#define RST_PIN 0         
+#define SS_PIN 2          
 #define BUZZER_PIN 15
 
 U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/ U8X8_PIN_NONE);
 MFRC522 mfrc522(SS_PIN, RST_PIN);
 
-char ssid[] = "LINH HOMIE F3 A";        // Wi-Fi network SSID
-char password[] = "LINHHOMIEcamon"; // Wi-Fi network password
+char ssid[] = "LINH HOMIE F3 A";       
+char password[] = "LINHHOMIEcamon"; 
+int COUNT_TIME = 0;
 
 void setup() {
   Serial.begin(115200);
@@ -43,24 +44,23 @@ void setup() {
 
   delay(1000);
 
-  u8g2.clearBuffer();
-  u8g2.setFont(u8g2_font_ncenB14_tr);
-  u8g2.setCursor(25, 16);
-  u8g2.print("Student");
-  u8g2.setCursor(10, 36);
-  u8g2.print("Attendance");
-  u8g2.sendBuffer();
+  displayMainScreen();
 
   pinMode(BUZZER_PIN, OUTPUT);
   digitalWrite(BUZZER_PIN, LOW);
 }
 
 void loop() {
+  if (COUNT_TIME == 50) {
+    displayMainScreen();
+    COUNT_TIME = 0;
+  }
 
   if (!mfrc522.PICC_IsNewCardPresent() || !mfrc522.PICC_ReadCardSerial()) {
+    COUNT_TIME++;
     delay(100);
     return;
-  }
+  } else COUNT_TIME = 0;
 
   String tagID = "";
   for (byte i = 0; i < mfrc522.uid.size; i++) {
@@ -77,6 +77,16 @@ void loop() {
   digitalWrite(BUZZER_PIN, LOW);
 
   delay(1000);
+}
+
+void displayMainScreen() {
+  u8g2.clearBuffer();
+  u8g2.setFont(u8g2_font_ncenB14_tr);
+  u8g2.setCursor(25, 16);
+  u8g2.print("Student");
+  u8g2.setCursor(10, 36);
+  u8g2.print("Attendance");
+  u8g2.sendBuffer();
 }
 
 void postNewStudent(String tagID) {
@@ -124,7 +134,7 @@ void parseStudentInfo(String tagID, String studentInfo) {
     return;
   }
   const char* name = doc["Name"];
-  const char* studentCode = doc["Student_Code"]; // "13E856FC"
+  const char* studentCode = doc["Student_Code"]; 
 
   displayStudentInformation(tagID, name, studentCode);
 
