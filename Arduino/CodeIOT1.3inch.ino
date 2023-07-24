@@ -8,14 +8,14 @@
 #include <ArduinoJson.h>
 
 #define OLED_ADDRESS 0x3C 
-#define RST_PIN 0         
-#define SS_PIN 2          
+#define RST_PIN 0        
+#define SS_PIN 2         
 #define BUZZER_PIN 15
 
 U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/ U8X8_PIN_NONE);
 MFRC522 mfrc522(SS_PIN, RST_PIN);
 
-char ssid[] = "LINH HOMIE F3 A";       
+char ssid[] = "LINH HOMIE F3 A";        
 char password[] = "LINHHOMIEcamon"; 
 int COUNT_TIME = 0;
 
@@ -87,6 +87,7 @@ void displayMainScreen() {
   u8g2.setCursor(10, 36);
   u8g2.print("Attendance");
   u8g2.sendBuffer();
+  
 }
 
 void postNewStudent(String tagID) {
