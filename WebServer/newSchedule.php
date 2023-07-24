@@ -26,13 +26,21 @@ if ($result->num_rows > 0) {
         $rfid = $row["RFID"];
         $status = "NY";
 
-        // Truy vấn để thêm bản ghi vào bảng Attendance
-        $insertQuery = "INSERT INTO Attendance (RFID, Status, Date) VALUES ('$rfid', '$status', '$currentDate')";
+        // Truy vấn kiểm tra xem bản ghi đã tồn tại hay chưa
+        $checkQuery = "SELECT RFID FROM Attendance WHERE RFID = '$rfid' AND Date = '$currentDate'";
+        $checkResult = $conn->query($checkQuery);
 
-        if ($conn->query($insertQuery) === TRUE) {
-            echo "Đã tạo lịch điểm danh cho sinh viên có RFID: $rfid<br>";
+        if ($checkResult->num_rows > 0) {
+            echo "Bản ghi đã tồn tại cho sinh viên có RFID: $rfid và ngày $currentDate<br>";
         } else {
-            echo "Lỗi: " . $insertQuery . "<br>" . $conn->error;
+            // Truy vấn để thêm bản ghi vào bảng Attendance
+            $insertQuery = "INSERT INTO Attendance (RFID, Status, Date) VALUES ('$rfid', '$status', '$currentDate')";
+
+            if ($conn->query($insertQuery) === TRUE) {
+                echo "Đã tạo lịch điểm danh cho sinh viên có RFID: $rfid và ngày $currentDate<br>";
+            } else {
+                echo "Lỗi: " . $insertQuery . "<br>" . $conn->error;
+            }
         }
     }
 } else {
