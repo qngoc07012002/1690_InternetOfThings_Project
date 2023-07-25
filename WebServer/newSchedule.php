@@ -24,7 +24,7 @@ if ($result->num_rows > 0) {
     
     while ($row = $result->fetch_assoc()) {
         $rfid = $row["RFID"];
-        $status = "NY";
+        $status = "Not Yet";
 
         $checkQuery = "SELECT RFID FROM Attendance WHERE RFID = '$rfid' AND Date = '$currentDate'";
         $checkResult = $conn->query($checkQuery);
