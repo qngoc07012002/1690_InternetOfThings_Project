@@ -17,10 +17,10 @@ if ($conn->connect_error) {
 $currentDate = date("Y-m-d");
 
 
-$markAbsentQuery = "UPDATE Attendance SET Status = 'AB' WHERE Status = 'NY' AND Date <= '$currentDate'";
+$markAbsentQuery = "UPDATE Attendance SET Status = 'Absent' WHERE Status = 'Not Yet' AND Date <= '$currentDate'";
 
 if ($conn->query($markAbsentQuery) === TRUE) {
-    echo "Đã đánh dấu các sinh viên có Status 'NY' thành 'AB' trong ngày $currentDate";
+    echo "Đã đánh dấu các sinh viên có Status 'Not Yet' thành 'Absent' trong ngày $currentDate";
 } else {
     echo "Lỗi: " . $markAbsentQuery . "<br>" . $conn->error;
 }
