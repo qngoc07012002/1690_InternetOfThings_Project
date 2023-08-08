@@ -72,7 +72,7 @@ void loop() {
   tagID.toUpperCase();
   mfrc522.PICC_HaltA();
 
-  getStudentInfo(tagID);
+  postTakeAttendance(tagID);
 
   digitalWrite(BUZZER_PIN, HIGH);
   delay(300);
@@ -117,19 +117,21 @@ void postNewStudent(String tagID) {
   http.end();
 }
 
-void getStudentInfo(String tagID) {
-  String url = "http://www.nqngoc.id.vn/get_StudentInfomation.php?rfid=" + tagID;
+void postTakeAttendance(String tagID) {
+  String url = "http://www.nqngoc.id.vn/post_TakeAttendance.php";
   WiFiClient client;
   HTTPClient http;
   String payload = "";
 
   http.begin(client, url);
-  int httpCode = http.GET();
+  http.addHeader("Content-Type", "application/x-www-form-urlencoded");
 
-  if (httpCode == HTTP_CODE_OK) {
+  String postData = "rfid=" + tagID;
+  int httpResponseCode = http.POST(postData);
+
+  if (httpResponseCode == HTTP_CODE_OK) {
     payload = http.getString();
     http.end();
-
   }
 
   http.end();
@@ -144,29 +146,33 @@ void parseStudentInfo(String tagID, String studentInfo) {
 
   if (doc.containsKey("error")) {
     const char* errorMsg = doc["error"];
-    Serial.println(errorMsg);
+    if (strcmp(errorMsg,"Student Not Found") == 0){
+      postNewStudent(tagID);
+      displayStudentInformation("New Student","");
+    } else 
+    if (strcmp(errorMsg,"No Schedule") == 0){
+      displayStudentInformation("No Schedule","");
+    } else 
+    if (strcmp(errorMsg,"New Student") == 0){
+      displayStudentInformation("New Student","");
+    }
     return;
   }
   const char* name = doc["Name"];
   const char* studentCode = doc["Student_Code"]; 
 
-  displayStudentInformation(tagID, name, studentCode);
+  displayStudentInformation(name, studentCode);
 
 }
 
-void displayStudentInformation(String rfid, String name, String studentCode) {
+void displayStudentInformation(String name, String studentCode) {
   u8g2.clearBuffer();
   u8g2.setFont(u8g2_font_ncenB08_tr);
-  if (name.isEmpty()) {
-    Serial.println(rfid);
-    postNewStudent(rfid);
-    u8g2.setCursor(5, 10);
-    u8g2.print("New Student");
-  } else {
-    u8g2.setCursor(5, 10);
-    u8g2.print(name);
-    u8g2.setCursor(5, 25);
-    u8g2.print(studentCode);
-  }
+
+  u8g2.setCursor(5, 10);
+  u8g2.print(name);
+  u8g2.setCursor(5, 25);
+  u8g2.print(studentCode);
+
   u8g2.sendBuffer();
 }
