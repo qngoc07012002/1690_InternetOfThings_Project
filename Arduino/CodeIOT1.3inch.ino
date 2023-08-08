@@ -51,6 +51,8 @@ void setup() {
 }
 
 void loop() {
+  postMarkAbsent();
+
   if (COUNT_TIME == 50) {
     displayMainScreen();
     COUNT_TIME = 0;
@@ -88,6 +90,17 @@ void displayMainScreen() {
   u8g2.print("Attendance");
   u8g2.sendBuffer();
   
+}
+
+void postMarkAbsent() {
+  String url = "http://www.nqngoc.id.vn/post_MarkAbsent.php";
+  WiFiClient client;
+  HTTPClient http;
+  http.begin(client, url);
+
+  int httpResponseCode = http.POST(" ");
+
+  http.end();
 }
 
 void postNewStudent(String tagID) {
