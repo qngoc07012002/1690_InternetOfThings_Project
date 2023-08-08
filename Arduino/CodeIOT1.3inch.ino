@@ -98,7 +98,7 @@ void postMarkAbsent() {
   HTTPClient http;
   http.begin(client, url);
 
-  int httpResponseCode = http.POST(" ");
+  int httpResponseCode = http.POST("a");
 
   http.end();
 }
@@ -142,9 +142,9 @@ void parseStudentInfo(String tagID, String studentInfo) {
 
   DeserializationError error = deserializeJson(doc, studentInfo);
 
-  if (error) {
-    Serial.print(F("deserializeJson() failed: "));
-    Serial.println(error.f_str());
+  if (doc.containsKey("error")) {
+    const char* errorMsg = doc["error"];
+    Serial.println(errorMsg);
     return;
   }
   const char* name = doc["Name"];
