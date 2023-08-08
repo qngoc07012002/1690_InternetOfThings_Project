@@ -11,6 +11,23 @@ if ($conn->connect_error) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $rfid = $_POST['rfid'];
+
+    $checkStudentQuery = "SELECT * FROM Student WHERE RFID = '$rfid'";
+    $result = $conn->query($checkStudentQuery);
+
+    if ($result->num_rows === 0) {
+        echo json_encode(array("error" => "Student Not Found"));
+        exit;
+    }
+
+    $student = $result->fetch_assoc();
+
+    if ($student['Name'] === 'New Student') {
+        echo json_encode(array("error" => "Student Not Found"));
+        exit;
+    }
+
     $currentDateTime = date("Y-m-d H:i:s");
 
     $checkSlotQuery = "SELECT SlotID FROM Slot WHERE TimeIn <= '$currentDateTime' AND TimeOut >= '$currentDateTime'";
@@ -18,23 +35,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($checkSlotResult->num_rows === 0) {
         echo json_encode(array("error" => "No Schedule"));
-        exit;
-    }
-
-    $rfid = $_POST['rfid'];
-
-    $checkStudentQuery = "SELECT * FROM Student WHERE RFID = '$rfid'";
-    $result = $conn->query($checkStudentQuery);
-
-    if ($result->num_rows === 0) {
-        echo json_encode(array("error" => "Student Not Found."));
-        exit;
-    }
-
-    $student = $result->fetch_assoc();
-
-    if ($student['Name'] === 'New Student') {
-        echo json_encode(array("error" => "New Student"));
         exit;
     }
 
