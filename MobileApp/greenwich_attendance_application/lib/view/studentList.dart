@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -6,7 +7,16 @@ import 'package:http/http.dart' as http;
 
 import 'package:greenwich_attendance_application/model/Student.dart';
 
+class MyHttpOverrides extends HttpOverrides{
+  @override
+  HttpClient createHttpClient(SecurityContext? context){
+    return super.createHttpClient(context)
+      ..badCertificateCallback = (X509Certificate cert, String host, int port)=> true;
+  }
+}
+
 void main() {
+  HttpOverrides.global = MyHttpOverrides();
   runApp(const StudentList());
 }
 
@@ -63,13 +73,20 @@ class _StudentListState extends State<_StudentList> {
                   itemCount: todos?.length,
                   itemBuilder: (context, index) {
                     return ListTile(
-                      leading: CircleAvatar(
-                        child: Text('${index + 1}'),
+                      contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 16),
+                      leading: Image.network(
+                        'https://nqngoc.id.vn/images/${todos?[index].avatar ?? 'ngoc.png'}',
+                        width: 60, // Điều chỉnh kích thước của hình ảnh bên trong
+                        height: 60,
+                        fit: BoxFit.fitWidth,
                       ),
                       title: Text(todos?[index].name ?? 'Not Found'),
                       subtitle: Text(todos?[index].studentCode ?? 'Not Found'),
+
                     );
+
                   },
+
                 );
               } else {
                 return const CircularProgressIndicator();
