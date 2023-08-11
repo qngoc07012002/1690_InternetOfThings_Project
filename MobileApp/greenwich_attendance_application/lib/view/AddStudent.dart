@@ -1,46 +1,30 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:greenwich_attendance_application/view/StudentList.dart';
 import 'package:http/http.dart' as http;
+import '../model/Student.dart';
 
-import 'package:greenwich_attendance_application/model/Student.dart';
-
-import 'AddStudent.dart';
-
-// class MyHttpOverrides extends HttpOverrides{
-//   @override
-//   HttpClient createHttpClient(SecurityContext? context){
-//     return super.createHttpClient(context)
-//       ..badCertificateCallback = (X509Certificate cert, String host, int port)=> true;
-//   }
-// }
-
-void main() {
-//  HttpOverrides.global = MyHttpOverrides();
-  runApp(const StudentList());
-}
-
-class StudentList extends StatelessWidget {
-  const StudentList({Key? key}) : super(key: key);
+class AddStudent extends StatelessWidget {
+  const AddStudent({super.key});
 
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-      home: _StudentList(),
+      home: _AddStudent(),
     );
   }
 }
 
-class _StudentList extends StatefulWidget {
-  const _StudentList({Key? key}) : super(key: key);
+class _AddStudent extends StatefulWidget {
+  const _AddStudent({super.key});
 
   @override
-  State<_StudentList> createState() => _StudentListState();
+  State<_AddStudent> createState() => _AddStudentState();
 }
 
-class _StudentListState extends State<_StudentList> {
+class _AddStudentState extends State<_AddStudent> {
   late Future<List<Student>> futureStudents;
 
   @override
@@ -57,11 +41,29 @@ class _StudentListState extends State<_StudentList> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () {
+            Navigator.push(
+              context,
+              PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) {
+                  return const StudentList();
+                },
+                transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                  return FadeTransition(
+                    opacity: animation,
+                    child: child,
+                  );
+                },
+              ),
+            );
+          }
+        ),
         centerTitle: true,
-        title: const Text("Student List"),
+        title: const Text("Add Student"),
       ),
       body: RefreshIndicator(
         onRefresh: _refreshStudents,
@@ -103,26 +105,6 @@ class _StudentListState extends State<_StudentList> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (context, animation, secondaryAnimation) {
-                return const AddStudent();
-              },
-              transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                return FadeTransition(
-                  opacity: animation,
-                  child: child,
-                );
-              },
-            ),
-          );
-        },
-        backgroundColor: Colors.blue,
-        child: const Icon(Icons.add),
-      ),
     );
   }
 
@@ -132,7 +114,7 @@ class _StudentListState extends State<_StudentList> {
   }
 
   Future<List<Student>> fetchStudents() async {
-    const url = "http://www.nqngoc.id.vn/get_StudentInfomation.php";
+    const url = "http://www.nqngoc.id.vn/get_NewStudent.php";
     final uri = Uri.parse(url);
     final response = await http.get(uri);
 
@@ -143,4 +125,3 @@ class _StudentListState extends State<_StudentList> {
     }
   }
 }
-
