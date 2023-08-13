@@ -91,7 +91,7 @@ class _AddStudentState extends State<_AddStudent> {
                             fit: BoxFit.fitWidth,
                           ),
                         ),
-                        title: Text(students?[index].name ?? 'Not Found'),
+                        title: Text(students?[index].rfid ?? 'Not Found'),
                         subtitle: Text(students?[index].studentCode ?? 'Not Found'),
                       ),
                     );
