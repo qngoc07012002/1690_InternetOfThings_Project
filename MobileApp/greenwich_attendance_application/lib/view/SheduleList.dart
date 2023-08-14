@@ -39,12 +39,32 @@ class _ScheduleListState extends State<_ScheduleList> {
     });
   }
   int selectedSlot = 1;
+  DateTime now = DateTime.now();
+
+  Color getColorForTime(String? timeIn, String? timeOut) {
+    if (timeIn == null || timeOut == null) {
+      return Colors.red; // Handle missing data
+    }
+
+    DateTime dateTimeIn = DateTime.parse(timeIn);
+    DateTime dateTimeOut = DateTime.parse(timeOut);
+
+    if (now.isAfter(dateTimeIn) && now.isBefore(dateTimeOut)) {
+      return Colors.yellow; // Within timeIn and timeOut
+    } else if (now.isBefore(dateTimeIn)) {
+      return Colors.red; // Before timeIn
+    } else {
+      return Colors.green; // After timeOut
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
         title: const Text("Schedule List"),
+
       ),
       body: RefreshIndicator(
         onRefresh: _refreshStudents,
@@ -68,6 +88,10 @@ class _ScheduleListState extends State<_ScheduleList> {
                         ),
                         title: Text('Slot ${slots?[index].slotName}' ?? 'Not Found'),
                         subtitle: Text('${slots?[index].timeIn} -> ${slots?[index].timeOut}' ?? 'Not Found'),
+                        trailing: Icon(
+                          Icons.access_alarm,
+                          color: getColorForTime(slots?[index].timeIn, slots?[index].timeOut),
+                        ),
                       ),
                     );
 
@@ -127,8 +151,9 @@ class _ScheduleListState extends State<_ScheduleList> {
                         const SizedBox(height: 10),
                         ElevatedButton(
                           onPressed: () {
-                            // Xử lý khi nút "Create" được nhấn
-                            print("Create button pressed for $selectedSlot");
+                            Navigator.pop(context);
+                            createSlot(selectedSlot);
+
                           },
                           child: const Text('Create'),
                         ),
@@ -166,5 +191,34 @@ class _ScheduleListState extends State<_ScheduleList> {
       throw Exception('Failed to load Todo');
     }
   }
+
+  void createSlot(int slotID) async {
+    final response = await http.post(
+      Uri.parse('http://www.nqngoc.id.vn/post_NewSlot.php'),
+      body: {'slot_value': slotID.toString()},
+    );
+
+    if (response.statusCode == 200) {
+      final responseData = json.decode(response.body);
+      if (responseData.containsKey('error')) {
+        final errorMessage = responseData['error'];
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(errorMessage)),
+        );
+      }else if (responseData.containsKey('success')) {
+        final successMessage = responseData['success'];
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(successMessage)),
+        );
+        setState(() {
+          _refreshStudents();
+        });
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to create slot')),
+      );
+    }
+    }
 }
 

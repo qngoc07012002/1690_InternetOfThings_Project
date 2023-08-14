@@ -1,7 +1,8 @@
 <?php
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-        $targetFile = basename($_FILES['image']['name']); // Lưu vào thư mục gốc
+        $targetDir = 'images/'; // Đường dẫn tới thư mục "images"
+        $targetFile = $targetDir . basename($_FILES['image']['name']); 
 
         if (move_uploaded_file($_FILES['image']['tmp_name'], $targetFile)) {
             echo 'Image uploaded successfully.';

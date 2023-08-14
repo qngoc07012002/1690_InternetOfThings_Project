@@ -172,6 +172,8 @@ class _EditProfileState extends State<_EditProfile> {
                       validator: (value){
                         if (value == null || value.isEmpty){
                           return 'Please enter Name';
+                        } else if (value == 'New Student') {
+                          return 'Please enter Name';
                         }
                         return null;
                       },
@@ -215,22 +217,33 @@ class _EditProfileState extends State<_EditProfile> {
                     const SizedBox(height: 20,),
                     ElevatedButton(
                       onPressed: () {
-                        if (_image == null || student.avatar == null){
+                        if (_image == null && student.avatar == null){
                           ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(content: Text('Please Choose Image!')));
                         } else {
                           if (_editProfileForm.currentState!.validate()){
-                            _uploadImage();
-                            
+                            if (_image != null){
+                              _uploadImage();
+                            }
+                            Student editStudent = Student(
+                              rfid: student.rfid,
+                              name: _name.text,
+                              studentCode: _studentCode.text,
+                              email: _email.text,
+                              avatar: _image == null ? student.avatar : _imageFile,
+                            );
+                            _updateProfile(editStudent);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Save Successful!')));
                           }
                         }
-                        if (_image != null) {
-                          _uploadImage();
-                        } else {
-                          print('No image selected');
-                        }
+                        // if (_image != null) {
+                        //   _uploadImage();
+                        // } else {
+                        //   print('No image selected');
+                        // }
                       },
-                      child: Text('Upload Image'),
+                      child: Text('Save'),
                     ),
                   ],
                 ),
@@ -258,6 +271,27 @@ class _EditProfileState extends State<_EditProfile> {
       print('Image uploaded successfully');
     } else {
       print('Image upload failed');
+    }
+  }
+
+  Future<void> _updateProfile(Student editStudent) async {
+    const url = 'http://www.nqngoc.id.vn/post_EditProfile.php';
+
+    final response = await http.post(
+      Uri.parse(url),
+      body: {
+        'rfid': editStudent.rfid,
+        'name': editStudent.name,
+        'student_code': editStudent.studentCode,
+        'email': editStudent.email,
+        'avatar': editStudent.avatar,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      print('Update Profile Successful');
+    } else {
+      print('Error: ${response.body}');
     }
   }
 }

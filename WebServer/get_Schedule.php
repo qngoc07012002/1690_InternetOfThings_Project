@@ -10,7 +10,9 @@ if ($conn->connect_error) {
     die("Connect SQL Fail: " . $conn->connect_error);
 }
 
-$sql = "SELECT * FROM Slot";
+$orderBy = "TimeIn"; 
+
+$sql = "SELECT * FROM Slot ORDER BY $orderBy DESC";
 $result = $conn->query($sql);
 
 if ($result->num_rows > 0) {
