@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:greenwich_attendance_application/view/StudentList.dart';
 import 'package:http/http.dart' as http;
 import '../model/Student.dart';
+import 'EditProfile.dart';
 
 class AddStudent extends StatelessWidget {
   const AddStudent({super.key});
@@ -44,7 +45,7 @@ class _AddStudentState extends State<_AddStudent> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             Navigator.push(
               context,
@@ -93,6 +94,24 @@ class _AddStudentState extends State<_AddStudent> {
                         ),
                         title: Text(students?[index].rfid ?? 'Not Found'),
                         subtitle: Text(students?[index].studentCode ?? 'Not Found'),
+                        onTap: (){
+                          Navigator.push(
+                            context,
+                            PageRouteBuilder(
+                              pageBuilder: (context, animation, secondaryAnimation) {
+                                return EditProfile(student: Student(
+                                  rfid: students?[index].rfid,
+                                ),);
+                              },
+                              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                                return FadeTransition(
+                                  opacity: animation,
+                                  child: child,
+                                );
+                              },
+                            ),
+                          );
+                        },
                       ),
                     );
 

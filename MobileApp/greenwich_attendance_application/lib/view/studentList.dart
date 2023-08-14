@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:greenwich_attendance_application/model/Student.dart';
 
 import 'AddStudent.dart';
+import 'EditProfile.dart';
 
 // class MyHttpOverrides extends HttpOverrides{
 //   @override
@@ -91,6 +92,28 @@ class _StudentListState extends State<_StudentList> {
                         ),
                         title: Text(students?[index].name ?? 'Not Found'),
                         subtitle: Text(students?[index].studentCode ?? 'Not Found'),
+                        onTap: (){
+                          Navigator.push(
+                            context,
+                            PageRouteBuilder(
+                              pageBuilder: (context, animation, secondaryAnimation) {
+                                return EditProfile(student: Student(
+                                  rfid: students?[index].rfid,
+                                  name: students?[index].name,
+                                  studentCode: students?[index].studentCode,
+                                  email: students?[index].email,
+                                  avatar: students?[index].avatar,
+                                ),);
+                              },
+                              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                                return FadeTransition(
+                                  opacity: animation,
+                                  child: child,
+                                );
+                              },
+                            ),
+                          );
+                        },
                       ),
                     );
 
