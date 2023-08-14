@@ -99,14 +99,7 @@ class _StudentListState extends State<_StudentList> {
                             PageRouteBuilder(
                               pageBuilder: (context, animation, secondaryAnimation) {
                                 return AttendanceHistory(rfid: students![index].rfid);
-                                // return EditProfile(student: Student(
-                                //   rfid: students?[index].rfid,
-                                //   name: students?[index].name,
-                                //   studentCode: students?[index].studentCode,
-                                //   email: students?[index].email,
-                                //   avatar: students?[index].avatar,
-                                // ),
-                                // );
+                  
                               },
                               transitionsBuilder: (context, animation, secondaryAnimation, child) {
                                 return FadeTransition(
