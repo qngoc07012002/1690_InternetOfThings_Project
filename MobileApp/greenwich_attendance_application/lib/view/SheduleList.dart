@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:greenwich_attendance_application/view/AttendanceStatusPage.dart';
 import 'package:http/http.dart' as http;
 import '../model/Slot.dart';
 import 'AddStudent.dart';
@@ -92,6 +93,23 @@ class _ScheduleListState extends State<_ScheduleList> {
                           Icons.access_alarm,
                           color: getColorForTime(slots?[index].timeIn, slots?[index].timeOut),
                         ),
+                        onTap: (){
+                          Navigator.push(
+                            context,
+                            PageRouteBuilder(
+                              pageBuilder: (context, animation, secondaryAnimation) {
+                                String? slotID = slots![index].slotID;
+                                return AttendanceStatusPage(slotID: int.parse(slotID ?? '0'),);
+                              },
+                              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                                return FadeTransition(
+                                  opacity: animation,
+                                  child: child,
+                                );
+                              },
+                            ),
+                          );
+                        },
                       ),
                     );
 

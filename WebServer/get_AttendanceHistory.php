@@ -21,12 +21,13 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
     if ($studentResult->num_rows > 0) {
         $studentData = $studentResult->fetch_assoc();
         
-        // Lấy lịch sử điểm danh từ bảng Attendance và Slot
+        // Lấy lịch sử điểm danh từ bảng Attendance và Slot, sắp xếp theo thời gian giảm dần
         $attendanceHistoryQuery = "
             SELECT A.AttendanceID, S.Name AS SlotName, A.Status, DATE(S.TimeIn) AS Date
             FROM Attendance A
             INNER JOIN Slot S ON A.SlotID = S.SlotID
             WHERE A.RFID = '$rfid'
+            ORDER BY S.TimeIn DESC
         ";
         
         $attendanceHistoryResult = $conn->query($attendanceHistoryQuery);

@@ -50,7 +50,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 // Tiếp tục với phần tạo Slot
                 $insertSlotQuery = "INSERT INTO Slot (Name, TimeIn, TimeOut) VALUES ('$slotName', '$timeIn', '$timeOut')";
                 if ($conn->query($insertSlotQuery) === TRUE) {
-                    $successResponse = array("success" => "Created slot successfully");
+                    $slotID = $conn->insert_id;
+
+                    // Tạo lịch cho sinh viên
+                    $selectRFIDQuery = "SELECT RFID FROM Student WHERE Name != 'New Student'";
+                    $result = $conn->query($selectRFIDQuery);
+
+                    if ($result->num_rows > 0) {
+                        while ($row = $result->fetch_assoc()) {
+                            $rfid = $row["RFID"];
+                            $status = "Not Yet";
+
+                            $insertAttendanceQuery = "INSERT INTO Attendance (SlotID, RFID, Status) VALUES ('$slotID', '$rfid', '$status')";
+                            if ($conn->query($insertAttendanceQuery) !== TRUE) {
+                                $errorResponse = array("error" => "Error: " . $insertAttendanceQuery . "<br>" . $conn->error);
+                                echo json_encode($errorResponse);
+                                exit();
+                            }
+                        }
+                    } else {
+                        $errorResponse = array("error" => "Không tìm thấy sinh viên nào có tên khác 'New Student'");
+                        echo json_encode($errorResponse);
+                        exit();
+                    }
+                    
+                    $successResponse = array("success" => "Create Schedule Succesful");
                     echo json_encode($successResponse);
                 } else {
                     $errorResponse = array("error" => "Error: " . $insertSlotQuery . "<br>" . $conn->error);
