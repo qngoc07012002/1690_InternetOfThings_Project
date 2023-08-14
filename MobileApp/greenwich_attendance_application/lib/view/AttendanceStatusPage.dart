@@ -22,7 +22,6 @@ class _AttendanceStatusPageState extends State<AttendanceStatusPage> {
 
     if (response.statusCode == 200) {
       if (mounted) {
-        // Check if the widget is still mounted before calling setState
         setState(() {
           studentStatusList = json.decode(response.body);
         });
@@ -45,7 +44,7 @@ class _AttendanceStatusPageState extends State<AttendanceStatusPage> {
 
   @override
   void dispose() {
-    timer.cancel(); // Cancel the timer when the widget is disposed
+    timer.cancel();
     super.dispose();
   }
 
