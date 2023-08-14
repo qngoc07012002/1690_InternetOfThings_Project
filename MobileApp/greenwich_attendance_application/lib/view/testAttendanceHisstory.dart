@@ -22,7 +22,7 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
   }
 
   Future<void> fetchData() async {
-    final response = await http.get(Uri.parse('http://your_api_url/api.php?rfid=${widget.rfid}'));
+    final response = await http.get(Uri.parse('http://www.nqngoc.id.vn/get_AttendanceHistory.php?rfid=${widget.rfid}'));
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
@@ -69,6 +69,6 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
 
 void main() {
   runApp(MaterialApp(
-    home: AttendanceHistoryScreen(rfid: 'your_rfid_value'),
+    home: AttendanceHistoryScreen(rfid: '337C95FC'),
   ));
 }

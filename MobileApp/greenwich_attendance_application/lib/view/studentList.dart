@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:greenwich_attendance_application/view/AttendanceHistory.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:greenwich_attendance_application/model/Student.dart';
@@ -97,13 +98,15 @@ class _StudentListState extends State<_StudentList> {
                             context,
                             PageRouteBuilder(
                               pageBuilder: (context, animation, secondaryAnimation) {
-                                return EditProfile(student: Student(
-                                  rfid: students?[index].rfid,
-                                  name: students?[index].name,
-                                  studentCode: students?[index].studentCode,
-                                  email: students?[index].email,
-                                  avatar: students?[index].avatar,
-                                ),);
+                                return AttendanceHistory(rfid: students![index].rfid);
+                                // return EditProfile(student: Student(
+                                //   rfid: students?[index].rfid,
+                                //   name: students?[index].name,
+                                //   studentCode: students?[index].studentCode,
+                                //   email: students?[index].email,
+                                //   avatar: students?[index].avatar,
+                                // ),
+                                // );
                               },
                               transitionsBuilder: (context, animation, secondaryAnimation, child) {
                                 return FadeTransition(
