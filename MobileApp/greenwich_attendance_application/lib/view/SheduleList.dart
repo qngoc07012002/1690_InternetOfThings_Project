@@ -12,7 +12,11 @@ class ScheduleList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
+      theme: ThemeData(
+        primaryColor: const Color.fromRGBO(46, 29, 91, 1),
+        primarySwatch: Colors.indigo,
+      ),
       home: _ScheduleList(),
     );
   }
@@ -123,6 +127,7 @@ class _ScheduleListState extends State<_ScheduleList> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
+
         onPressed: () {
           showModalBottomSheet<void>(
             context: context,
@@ -182,12 +187,13 @@ class _ScheduleListState extends State<_ScheduleList> {
                 },
               );
             },
+            backgroundColor: const Color.fromRGBO(46, 29, 91, 1),
           );
 
 
 
         },
-        backgroundColor: Colors.blue,
+        backgroundColor: const Color.fromRGBO(46, 29, 91, 1),
         child: const Icon(Icons.add),
       ),
     );

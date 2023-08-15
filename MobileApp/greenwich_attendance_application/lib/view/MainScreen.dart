@@ -2,10 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:greenwich_attendance_application/view/StudentList.dart';
 
+import 'LoginForm.dart';
 import 'SheduleList.dart';
 
 void main() {
-//  HttpOverrides.global = MyHttpOverrides();
   runApp(const MainScreen());
 }
 
@@ -14,9 +14,8 @@ class MainScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: _MainScreen(),
-    );
+    return _MainScreen();
+
   }
 }
 
@@ -39,6 +38,7 @@ class _MainScreenState extends State<_MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
       body: Center(
         child: _pages.elementAt(_selectedIndex),
       ),
@@ -48,14 +48,17 @@ class _MainScreenState extends State<_MainScreen> {
             icon: Icon(Icons.people),
             label: 'Students',
           ),
+
           BottomNavigationBarItem(
             icon: Icon(Icons.calendar_month),
             label: 'Shedule',
           ),
+
         ],
         currentIndex: _selectedIndex, //New
         onTap: _onItemTapped,
       ),
+
     );
   }
 

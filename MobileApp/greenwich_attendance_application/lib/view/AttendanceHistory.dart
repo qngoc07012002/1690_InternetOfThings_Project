@@ -54,7 +54,7 @@ class _AttendanceHistoryState extends State<AttendanceHistory> {
       body: Stack(
         children: <Widget>[
           Container(
-            color: Colors.blue,
+            color: Colors.indigo,
             height: 0.30 * height,
             child: Padding(
               padding: const EdgeInsets.only(left: 20, right: 30, top: 20),

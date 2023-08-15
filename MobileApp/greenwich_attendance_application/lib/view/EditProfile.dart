@@ -17,6 +17,10 @@ class EditProfile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData(
+        primaryColor: const Color.fromRGBO(46, 29, 91, 1),
+        primarySwatch: Colors.indigo,
+      ),
       home: _EditProfile(student: student),
     );
   }

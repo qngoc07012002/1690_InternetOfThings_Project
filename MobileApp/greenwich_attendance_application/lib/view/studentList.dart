@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:greenwich_attendance_application/view/AttendanceHistory.dart';
+import 'package:greenwich_attendance_application/view/LoginForm.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:greenwich_attendance_application/model/Student.dart';
@@ -29,8 +30,12 @@ class StudentList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: _StudentList(),
+    return MaterialApp(
+      theme: ThemeData(
+        primaryColor: const Color.fromRGBO(46, 29, 91, 1),
+        primarySwatch: Colors.indigo,
+      ),
+      home: const _StudentList(),
     );
   }
 }
@@ -64,6 +69,7 @@ class _StudentListState extends State<_StudentList> {
       appBar: AppBar(
         centerTitle: true,
         title: const Text("Student List"),
+
       ),
       body: RefreshIndicator(
         onRefresh: _refreshStudents,
@@ -139,7 +145,7 @@ class _StudentListState extends State<_StudentList> {
             ),
           );
         },
-        backgroundColor: Colors.blue,
+        backgroundColor: const Color.fromRGBO(46, 29, 91, 1),
         child: const Icon(Icons.add),
       ),
     );
