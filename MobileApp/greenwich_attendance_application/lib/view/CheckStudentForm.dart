@@ -1,9 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:greenwich_attendance_application/view/AttendanceHistory.dart';
 import 'package:greenwich_attendance_application/view/LoginForm.dart';
-
+import 'package:http/http.dart' as http;
+import 'CheckStudent.dart';
 import 'MainScreen.dart';
 import 'StudentList.dart';
 
@@ -33,6 +36,8 @@ class _CheckStudentForm extends StatefulWidget {
 class _CheckStudentFormState extends State<_CheckStudentForm> {
   final _loginForm = GlobalKey<FormState>();
   final _studentCode = TextEditingController();
+  Map<String, dynamic>? studentData;
+  List<dynamic> attendanceHistory = [];
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -109,20 +114,7 @@ class _CheckStudentFormState extends State<_CheckStudentForm> {
                         ),
                         onPressed:() async {
                           if (_loginForm.currentState!.validate()){
-                              Navigator.push(
-                                context,
-                                PageRouteBuilder(
-                                  pageBuilder: (context, animation, secondaryAnimation) {
-                                    return AttendanceHistory(rfid: _studentCode.text);
-                                  },
-                                  transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                                    return FadeTransition(
-                                      opacity: animation,
-                                      child: child,
-                                    );
-                                  },
-                                ),
-                              );
+                            fetchStudentInfo();
                           }
                         },
                         child: const Text(
@@ -156,6 +148,47 @@ class _CheckStudentFormState extends State<_CheckStudentForm> {
         child: const Icon(Icons.home),
       ),
     );
+  }
+
+  Future<void> fetchStudentInfo() async {
+    final url = 'http://www.nqngoc.id.vn/get_AttendanceHistory_Student.php';
+
+    final response = await http.post(
+      Uri.parse(url),
+      body: {'studentCode': _studentCode.text},
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+
+      if (data.containsKey('error')) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(data['error'])),
+        );
+      } else {
+          studentData = data['Student'];
+          attendanceHistory = data['AttendanceHistory'];
+        Navigator.push(
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) {
+              return CheckAttendanceHistory(studentData: studentData, attendanceHistory: attendanceHistory,);
+            },
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(
+                opacity: animation,
+                child: child,
+              );
+            },
+          ),
+        );
+
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error fetching data')),
+      );
+    }
   }
 }
 

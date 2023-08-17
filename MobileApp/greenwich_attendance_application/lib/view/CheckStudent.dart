@@ -7,9 +7,10 @@ import 'package:http/http.dart' as http;
 import '../model/Student.dart';
 import 'EditProfile.dart';
 class CheckAttendanceHistory extends StatefulWidget {
-  final String? rfid;
+  Map<String, dynamic>? studentData;
+  List<dynamic> attendanceHistory = [];
 
-  CheckAttendanceHistory({required this.rfid});
+  CheckAttendanceHistory({required this.studentData, required this.attendanceHistory});
 
 
   @override
@@ -23,24 +24,9 @@ class CheckAttendanceHistoryState extends State<CheckAttendanceHistory> {
   @override
   void initState() {
     super.initState();
-    fetchData();
+    studentData = widget.studentData;
+    attendanceHistory = widget.attendanceHistory;
   }
-
-  Future<void> fetchData() async {
-    final response = await http.get(Uri.parse('http://www.nqngoc.id.vn/get_AttendanceHistory.php?rfid=${widget.rfid}'));
-
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-
-      setState(() {
-        studentData = data['Student'];
-        attendanceHistory = data['AttendanceHistory'];
-      });
-    } else {
-      throw Exception('Failed to fetch data');
-    }
-  }
-
 
   @override
   Widget build(BuildContext context) {
@@ -101,49 +87,7 @@ class CheckAttendanceHistoryState extends State<CheckAttendanceHistory> {
                               color: Colors.white,
                               fontSize: 15,
                             ),),
-                            SizedBox(height: 0.018 * height,),
-                            Row(
-                              children: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                    border: Border.all(color: Colors.white),
-                                    borderRadius: BorderRadius.circular(5.0),
-                                  ),
-                                  child: Padding(
-                                    padding: EdgeInsets.all(8.0),
-                                    child: InkWell(
-                                      child: const Text("EDIT PROFILE", style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 15,
-                                      ),),
-                                      onTap: (){
-                                        Navigator.push(
-                                          context,
-                                          PageRouteBuilder(
-                                            pageBuilder: (context, animation, secondaryAnimation) {
-                                              return EditProfile(student: Student(
-                                                rfid: widget.rfid,
-                                                name: studentData?['Name'],
-                                                studentCode: studentData?['Student_Code'],
-                                                email: studentData?['Email'],
-                                                avatar: studentData?['Avatar'],
-                                              ),
-                                              );
-                                            },
-                                            transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                                              return FadeTransition(
-                                                opacity: animation,
-                                                child: child,
-                                              );
-                                            },
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                )
-                              ],
-                            )
+
                           ],
                         )
                       ],
